@@ -391,9 +391,20 @@ func _on_line_edit_text_submitted(new_text: String) -> void:
 	if status == Status.CORRECTED:
 		accept_corrected()
 
-
-## Call [code]get_tree().call_group("local_changed_listeners", "on_locale_changed")[/code]
+# DO NOT EDIT THIS FUNCTION HERE, see res://addons/smart_line_edit/config.tool.gd
+# REGEX_FUNC_A
+## Call [code]get_tree().call_group("locale_changed_listeners", "on_locale_changed")[/code]
 ## when changing locale to update strings that are using locale.
 func on_locale_changed() -> void:
 	update_tooltip()
 	update_accept_corrected_tooltip()
+# REGEX_FUNC_B
+
+# DO NOT EDIT THIS FUNCTION HERE, see res://addons/smart_line_edit/config.tool.gd
+# REGEX_NOTIF_A
+func _notification(what: int) -> void:
+	if not Engine.is_editor_hint():
+		match what:
+			NOTIFICATION_TRANSLATION_CHANGED:
+				on_locale_changed()
+# REGEX_NOTIF_B
