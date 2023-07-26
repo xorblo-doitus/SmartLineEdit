@@ -11,3 +11,6 @@ export_presets.cfg
 
 # GUT
 .gut_editor_shortcuts.cfg
+
+# Temporary files
+*.tmp
