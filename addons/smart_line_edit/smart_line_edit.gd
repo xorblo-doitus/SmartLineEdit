@@ -50,6 +50,12 @@ static var file_dialog: FileDialog:
 			shrink()
 		if last_valid_text in default_valid_texts:
 			last_valid_text = default_valid_texts[type]
+		
+		if type == Types.INT or type == Types.FLOAT:
+			_expression = Expression.new()
+		else:
+			_expression = null
+			
 
 @export_group("Modifiers")
 ## String compiled into a Regex. If Regex don't match anything, string will be wrong.
@@ -149,6 +155,7 @@ static var file_dialog: FileDialog:
 var status: Status = Status.OK
 var _file_regexes: Array[RegEx] = []
 var _regex: RegEx
+var _expression: Expression
 
 func _ready() -> void:
 	set_line_edit_text(last_valid_text)
@@ -227,9 +234,22 @@ func is_ok(text: String):
 			else:
 				wrong = true
 		Types.INT:
-			if text.is_valid_float(): # Check float because "1.5" is invalid int but int() manage to read 1
+			var number: float = 0.0
+			var parsed: bool = false
+			
+			if _expression.parse(text) == Error.OK:
+				var attempt = _expression.execute([], null, false)
+				if not _expression.has_execute_failed():
+					number = attempt
+					parsed = true
+					
+			if not parsed and text.is_valid_float():
+				number = float(text)
+				parsed = true
+					
+			if parsed:
 				var new_text: String = str(snappedi(
-					clamp(float(text), minimum, maximum),
+					clamp(number, minimum, maximum),
 					step if step else 1 # step = 0 disturbs rounding (3.7 → 3 instead of 4)
 				))
 				if new_text != text:
@@ -237,9 +257,23 @@ func is_ok(text: String):
 					was_modified = true
 			else:
 				wrong = true
+			
 		Types.FLOAT:
-			if text.is_valid_float():
-				var new_text: String = str(snappedf(clampf(float(text), minimum, maximum), step))
+			var number: float = 0.0
+			var parsed: bool = false
+			
+			if _expression.parse(text) == Error.OK:
+				var attempt = _expression.execute([], null, false)
+				if not _expression.has_execute_failed():
+					number = attempt
+					parsed = true
+			
+			if not parsed and text.is_valid_float():
+				number = float(text)
+				parsed = true
+					
+			if parsed:
+				var new_text: String = str(snappedf(clampf(number, minimum, maximum), step))
 				if new_text != text:
 					text = new_text
 					was_modified = true

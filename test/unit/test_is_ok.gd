@@ -40,6 +40,11 @@ func assert_is_ok(text: String, expected):
 func test_int():
 	SME.type = SmartLineEdit.Types.INT
 	assert_is_ok("1", true)
+	assert_is_ok("1 + 1", "2")
+	assert_is_ok("10 / 2", "5")
+	assert_is_ok("10 / 2", "5")
+	assert_is_ok("abs(-1)", "1")
+	assert_is_ok("a", false)
 	
 	SME.minimum = -5
 	SME.maximum = 5
@@ -64,6 +69,13 @@ func test_int():
 
 func test_float():
 	SME.type = SmartLineEdit.Types.FLOAT
+	
+	assert_is_ok("1 + 1", "2")
+	assert_is_ok("10 / 2", "5")
+	assert_is_ok("10 / 2", "5")
+	assert_is_ok("abs(-1)", "1")
+	assert_is_ok("a", false)
+	
 	SME.minimum = -5
 	SME.maximum = 5
 	assert_is_ok("1", true)
