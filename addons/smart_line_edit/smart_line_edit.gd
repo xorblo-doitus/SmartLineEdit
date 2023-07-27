@@ -74,6 +74,14 @@ static var file_dialog: FileDialog:
 @export var maximum: float = 1.79769e308
 ## Only applies if [member type] is set to a number type (int, float...)
 @export var step: float = 0.0
+## See [method Expression.parse] parameter called [code]input_names[/code]
+@export var expression_input_names: PackedStringArray = PackedStringArray()
+## See [method Expression.execute] parameter called [code]inputs[/code]
+@export var expression_inputs: Array = []
+## See [method Expression.execute] parameter called [code]base_instance[/code]
+var expression_base_instance: Object
+## See [method Expression.execute] parameter called [code]const_calls_only[/code]
+@export var expression_const_calls_only: bool = false
 @export_subgroup("File and Directory")
 ## If true, only path to existing file/directory will be valid
 @export var must_exist: bool = true
@@ -237,8 +245,8 @@ func is_ok(text: String):
 			var number: float = 0.0
 			var parsed: bool = false
 			
-			if _expression.parse(text) == Error.OK:
-				var attempt = _expression.execute([], null, false)
+			if _expression.parse(text, expression_input_names) == Error.OK:
+				var attempt = _expression.execute(expression_inputs, expression_base_instance, false, expression_const_calls_only)
 				if not _expression.has_execute_failed():
 					number = attempt
 					parsed = true
@@ -262,8 +270,8 @@ func is_ok(text: String):
 			var number: float = 0.0
 			var parsed: bool = false
 			
-			if _expression.parse(text) == Error.OK:
-				var attempt = _expression.execute([], null, false)
+			if _expression.parse(text, expression_input_names) == Error.OK:
+				var attempt = _expression.execute(expression_inputs, expression_base_instance, false, expression_const_calls_only)
 				if not _expression.has_execute_failed():
 					number = attempt
 					parsed = true
