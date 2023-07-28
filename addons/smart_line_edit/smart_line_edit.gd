@@ -6,6 +6,7 @@ class_name SmartLineEdit
 ## A LineEdit wich can perform string validation
 
 signal valid_text_changed(new_text: String, old_text: String)
+signal value_changed(new_value, old_value)
 signal status_changed(new_status: Status, old_status: Status)
 
 enum Types {
@@ -423,6 +424,7 @@ func open_file_dialog() -> void:
 func _on_valid_text_changed(new_text: String, old_text: String) -> void:
 	update_accept_corrected_button()
 	update_tooltip()
+	value_changed.emit(eval(new_text), eval(old_text))
 
 
 func accept_corrected() -> void:
