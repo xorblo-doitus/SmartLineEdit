@@ -51,10 +51,7 @@ static var file_dialog: FileDialog:
 		if last_valid_text in default_valid_texts:
 			last_valid_text = default_valid_texts[type]
 		
-		if type == Types.INT or type == Types.FLOAT:
-			_expression = Expression.new()
-		else:
-			_expression = null
+		_setup_expression()
 			
 
 @export_group("Modifiers")
@@ -164,6 +161,11 @@ var status: Status = Status.OK
 var _file_regexes: Array[RegEx] = []
 var _regex: RegEx
 var _expression: Expression
+
+
+func _init() -> void:
+	_setup_expression()
+
 
 func _ready() -> void:
 	set_line_edit_text(last_valid_text)
@@ -427,6 +429,13 @@ func accept_corrected() -> void:
 	line_edit.text = last_valid_text
 	status = Status.OK
 	status_changed.emit(status, Status.CORRECTED)
+
+
+func _setup_expression() -> void:
+	if type == Types.INT or type == Types.FLOAT:
+		_expression = Expression.new()
+	else:
+		_expression = null
 
 
 func _on_line_edit_text_submitted(new_text: String) -> void:
