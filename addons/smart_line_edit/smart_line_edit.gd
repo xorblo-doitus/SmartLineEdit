@@ -46,14 +46,7 @@ static var file_dialog: FileDialog:
 @export var type: Types = Types.INT:
 	set(new):
 		type = new
-		if open_file_dialog_button:
-			open_file_dialog_button.visible = type == Types.DIRECTORY or type == Types.FILE
-			shrink()
-		if last_valid_text in default_valid_texts:
-			last_valid_text = default_valid_texts[type]
-		
-		_setup_expression()
-			
+		_adapt_to_type()
 
 @export_group("Modifiers")
 ## String compiled into a Regex. If Regex don't match anything, string will be wrong.
@@ -96,26 +89,7 @@ var expression_base_instance: Object
 	set(new):
 		file_patterns = new
 		get_file_dialog().filters = file_patterns
-		
-		_file_regexes.clear()
-		
-		for line in file_patterns:
-			for pattern in line.split(";", false)[0].split(","):
-				## Build Regex from file pattern
-				_file_regexes.push_back(
-					RegEx.create_from_string(
-						"^%s$" % (
-							pattern.strip_edges().replace(
-								".", "\\." # Escape dot
-							).replace(
-								"*", ".*" # * matches any character 0 or more times
-							).replace(
-								"?", "." # ? matches any character 1 time
-							)
-						)
-					)
-				)
-			
+		_build_file_regexes()
 
 @export_group("Tool Tip", "tooltip_")
 ## Base tooltip for the LineEdit.
@@ -444,6 +418,42 @@ func accept_corrected() -> void:
 	line_edit.text = last_valid_text
 	status = Status.OK
 	status_changed.emit(status, Status.CORRECTED)
+
+
+## Create regexes matching the same strings as [member file_patterns]
+func _build_file_regexes() -> void:
+	_file_regexes.clear()
+	
+	for line in file_patterns:
+		for pattern in line.split(";", false)[0].split(","):
+			## Build Regex from file pattern
+			_file_regexes.push_back(
+				RegEx.create_from_string(
+					"^%s$" % (
+						pattern.strip_edges().replace(
+							".", "\\." # Escape dot
+						).replace(
+							"*", ".*" # * matches any character 0 or more times
+						).replace(
+							"?", "." # ? matches any character 1 time
+						)
+					)
+				)
+			)
+
+
+## Perform modifications to enable/disable functionnalities according to [member type]
+func _adapt_to_type() -> void:
+	# Show or not the file dialog button
+	if open_file_dialog_button:
+		open_file_dialog_button.visible = type == Types.DIRECTORY or type == Types.FILE
+		shrink()
+	
+	# Update last_valid_text if it was left to default
+	if last_valid_text in default_valid_texts:
+		last_valid_text = default_valid_texts[type]
+	
+	_setup_expression()
 
 
 func _setup_expression() -> void:
