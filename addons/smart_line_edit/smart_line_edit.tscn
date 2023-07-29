@@ -23,8 +23,7 @@ theme_type_variation = &"LineEdit_OK"
 text = "1"
 expand_to_text_length = true
 
-[node name="AcceptCorrected" type="Button" parent="."]
-visible = false
+[node name="Submit" type="Button" parent="."]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 icon = ExtResource("2_trcu3")
@@ -37,8 +36,9 @@ tooltip_text = "Open file explorer"
 icon = ExtResource("3_4uo8e")
 
 [connection signal="status_changed" from="." to="." method="_on_status_changed"]
+[connection signal="submited" from="." to="." method="_on_submited"]
 [connection signal="valid_text_changed" from="." to="." method="_on_valid_text_changed"]
 [connection signal="text_changed" from="LineEdit" to="." method="_on_line_edit_text_changed"]
 [connection signal="text_submitted" from="LineEdit" to="." method="_on_line_edit_text_submitted"]
-[connection signal="pressed" from="AcceptCorrected" to="." method="accept_corrected"]
+[connection signal="pressed" from="Submit" to="." method="_on_submit_pressed"]
 [connection signal="pressed" from="OpenFileDialog" to="." method="open_file_dialog"]

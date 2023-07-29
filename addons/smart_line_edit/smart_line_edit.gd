@@ -8,6 +8,7 @@ class_name SmartLineEdit
 signal valid_text_changed(new_text: String, old_text: String)
 signal value_changed(new_value, old_value)
 signal status_changed(new_status: Status, old_status: Status)
+signal submited(value)
 
 enum Types {
 	DIRECTORY, ## Must be a path to a directory. It will be made canonical on submit.
@@ -103,11 +104,14 @@ var expression_base_instance: Object
 @export var tooltip_corrected: String = "Interpreted as {corrected} instead of what was inputed."
 ## Tooltip appended to the LineEdit when it's content is wrong.
 ## Translation automatically handled via [method Object.tr].
-@export var tooltip_wrong: String = "Input is invalid."
-@export var tooltip_accept_corrected: String = "Accept corrected input : {corrected}"
+@export var tooltip_wrong: String = "Input is invalid, last valid text is \"{corrected}\"."
+@export_subgroup("Submit button tooltips", "tooltip_submit_")
+@export var tooltip_submit_ok: String = "Submit your input."
+@export var tooltip_submit_accept_corrected: String = "Accept corrected input: {corrected}"
+@export var tooltip_submit_wrong: String = "Restore last valid text: {corrected}"
 @export_group("")
 
-## The last valid text inputed. Please enter a valid text in the editorso it has one on start.
+## The last valid text inputed. Please enter a valid text in the editor so it has one on start.
 @export var last_valid_text: String = default_valid_texts[type]
 
 ## Allow the addition of more checking functions to decide if it's a correct string.
@@ -128,7 +132,7 @@ var expression_base_instance: Object
 
 ## The LineEdit used by this SmartLineEdit
 @onready var line_edit: LineEdit = $LineEdit
-@onready var accept_corrected_button: Button = $AcceptCorrected
+@onready var submit_button: Button = $Submit
 @onready var open_file_dialog_button: Button = $OpenFileDialog
 
 
@@ -147,10 +151,9 @@ func _ready() -> void:
 	
 	if not Engine.is_editor_hint() and status == Status.WRONG:
 		push_warning("Starting valid text is invalid on SmartLineEdit at" + str(get_path()))
-
-#	set_line_edit_text(last_valid_text)
-	update_accept_corrected_button()
+	
 	update_tooltip()
+	update_submit_button_tooltip()
 	
 	shrink()
 
@@ -341,29 +344,32 @@ func get_tooltip_with_status() -> String:
 			return tooltip_corrected
 		Status.WRONG:
 			return tooltip_wrong
-	return ""
+	return "Error finding tooltip: Status unknown."
 
 
 func update_tooltip() -> void:
 	line_edit.tooltip_text = format(tr(tooltip_base) + tr(get_tooltip_with_status()))
 
 
-func update_accept_corrected_tooltip() -> void:
-	accept_corrected_button.tooltip_text = format(tr(tooltip_accept_corrected))
+func _get_raw_submit_button_tooltip() -> String:
+	match status:
+		Status.OK:
+			return tooltip_submit_ok
+		Status.CORRECTED:
+			return tooltip_submit_accept_corrected
+		Status.WRONG:
+			return tooltip_submit_wrong
+	return "Error finding tooltip: Status unknown."
 
 
-func update_accept_corrected_button() -> void:
-	if status == Status.CORRECTED:
-		accept_corrected_button.show()
-		update_accept_corrected_tooltip()
-	else:
-		accept_corrected_button.hide()
+func update_submit_button_tooltip() -> void:
+	submit_button.tooltip_text = format(tr(_get_raw_submit_button_tooltip()))
 
 
 func _on_status_changed(new_status: Status, old_status: Status) -> void:
 	line_edit.theme_type_variation = "LineEdit_" + Status.keys()[new_status]
 	
-	update_accept_corrected_button()
+	update_submit_button_tooltip()
 	update_tooltip()
 
 
@@ -409,7 +415,7 @@ func open_file_dialog() -> void:
 
 
 func _on_valid_text_changed(new_text: String, old_text: String) -> void:
-	update_accept_corrected_button()
+	update_submit_button_tooltip()
 	update_tooltip()
 	value_changed.emit(eval(new_text), eval(old_text))
 
@@ -418,6 +424,19 @@ func accept_corrected() -> void:
 	line_edit.text = last_valid_text
 	status = Status.OK
 	status_changed.emit(status, Status.CORRECTED)
+	update_submit_button_tooltip()
+
+
+func submit() -> void:
+	# Match every case because `accept_corrected` modifies status
+	match status:
+		Status.WRONG:
+			accept_corrected()
+		Status.CORRECTED:
+			accept_corrected()
+			submited.emit(eval(last_valid_text))
+		Status.OK:
+			submited.emit(eval(last_valid_text))
 
 
 ## Create regexes matching the same strings as [member file_patterns]
@@ -464,8 +483,10 @@ func _setup_expression() -> void:
 
 
 func _on_line_edit_text_submitted(new_text: String) -> void:
-	if status == Status.CORRECTED:
-		accept_corrected()
+	submit()
+func _on_submit_pressed() -> void:
+	submit()
+
 
 # DO NOT EDIT THIS FUNCTION HERE, see res://addons/smart_line_edit/config.tool.gd
 # REGEX_FUNC_A
@@ -473,7 +494,7 @@ func _on_line_edit_text_submitted(new_text: String) -> void:
 ## when changing locale to update strings that are using locale.
 func on_locale_changed() -> void:
 	update_tooltip()
-	update_accept_corrected_tooltip()
+	update_submit_button_tooltip()
 # REGEX_FUNC_B
 
 # DO NOT EDIT THIS FUNCTION HERE, see res://addons/smart_line_edit/config.tool.gd
