@@ -5,8 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://d1kx0svywrwxq" path="res://addons/smart_line_edit/Folder.svg" id="3_4uo8e"]
 
 [node name="SmartLineEdit" type="HBoxContainer"]
-offset_right = 200.0
-offset_bottom = 23.0
+offset_right = 228.0
+offset_bottom = 24.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 script = ExtResource("1_nxr81")
@@ -36,7 +36,6 @@ tooltip_text = "Open file explorer"
 icon = ExtResource("3_4uo8e")
 
 [connection signal="status_changed" from="." to="." method="_on_status_changed"]
-[connection signal="submited" from="." to="." method="_on_submited"]
 [connection signal="valid_text_changed" from="." to="." method="_on_valid_text_changed"]
 [connection signal="text_changed" from="LineEdit" to="." method="_on_line_edit_text_changed"]
 [connection signal="text_submitted" from="LineEdit" to="." method="_on_line_edit_text_submitted"]
