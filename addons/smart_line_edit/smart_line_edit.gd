@@ -488,13 +488,17 @@ func _on_submit_pressed() -> void:
 	submit()
 
 
+func update_locale() -> void:
+	update_tooltip()
+	update_submit_button_tooltip()
+
+
 # DO NOT EDIT THIS FUNCTION HERE, see res://addons/smart_line_edit/config.tool.gd
 # REGEX_FUNC_A
 ## Call [code]get_tree().call_group("locale_changed_listeners", "on_locale_changed")[/code]
 ## when changing locale to update strings that are using locale.
 func on_locale_changed() -> void:
-	update_tooltip()
-	update_submit_button_tooltip()
+	update_locale()
 # REGEX_FUNC_B
 
 # DO NOT EDIT THIS FUNCTION HERE, see res://addons/smart_line_edit/config.tool.gd

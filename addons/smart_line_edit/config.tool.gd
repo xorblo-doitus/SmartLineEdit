@@ -27,8 +27,7 @@ var locale_function: String = "on_locale_changed"
 const _func_script: String = """## Call [code]get_tree().call_group("locale_changed_listeners", "on_locale_changed")[/code]
 ## when changing locale to update strings that are using locale.
 func {func_name}() -> void:
-	update_tooltip()
-	update_submit_button_tooltip()"""
+	update_locale()"""
 const _notif_script: String = """func _notification(what: int) -> void:
 	if not Engine.is_editor_hint():
 		match what:
