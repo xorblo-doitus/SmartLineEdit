@@ -1,5 +1,5 @@
 @tool
-@icon("LineEdit.svg")
+@icon("SmartLineEdit.svg")
 @static_unload
 extends HBoxContainer
 class_name SmartLineEdit
