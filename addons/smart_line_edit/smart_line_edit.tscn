@@ -19,25 +19,34 @@ layout_mode = 2
 size_flags_vertical = 4
 tooltip_text = "Enter your input.
 Input is valid."
+focus_neighbor_right = NodePath("../OpenFileDialog")
+focus_next = NodePath("../OpenFileDialog")
 theme_type_variation = &"LineEdit_OK"
 text = "1"
 expand_to_text_length = true
-
-[node name="Submit" type="Button" parent="."]
-custom_minimum_size = Vector2(24, 0)
-layout_mode = 2
-icon = ExtResource("2_trcu3")
 
 [node name="OpenFileDialog" type="Button" parent="."]
 visible = false
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 tooltip_text = "Open file explorer"
+focus_neighbor_left = NodePath("../LineEdit")
+focus_neighbor_right = NodePath("../Submit")
+focus_next = NodePath("../Submit")
+focus_previous = NodePath("../LineEdit")
 icon = ExtResource("3_4uo8e")
+
+[node name="Submit" type="Button" parent="."]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+tooltip_text = "Submit your input."
+focus_neighbor_left = NodePath("../OpenFileDialog")
+focus_previous = NodePath("../OpenFileDialog")
+icon = ExtResource("2_trcu3")
 
 [connection signal="status_changed" from="." to="." method="_on_status_changed"]
 [connection signal="valid_text_changed" from="." to="." method="_on_valid_text_changed"]
 [connection signal="text_changed" from="LineEdit" to="." method="_on_line_edit_text_changed"]
 [connection signal="text_submitted" from="LineEdit" to="." method="_on_line_edit_text_submitted"]
-[connection signal="pressed" from="Submit" to="." method="_on_submit_pressed"]
 [connection signal="pressed" from="OpenFileDialog" to="." method="open_file_dialog"]
+[connection signal="pressed" from="Submit" to="." method="_on_submit_pressed"]
