@@ -17,6 +17,7 @@ last_valid_text = "1"
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_vertical = 4
+auto_translate = false
 tooltip_text = "Enter your input.
 Input is valid."
 focus_neighbor_right = NodePath("../OpenFileDialog")
@@ -39,6 +40,7 @@ icon = ExtResource("3_4uo8e")
 [node name="Submit" type="Button" parent="."]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
+auto_translate = false
 tooltip_text = "Submit your input."
 focus_neighbor_left = NodePath("../OpenFileDialog")
 focus_previous = NodePath("../OpenFileDialog")
