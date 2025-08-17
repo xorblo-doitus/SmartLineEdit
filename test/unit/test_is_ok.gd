@@ -157,3 +157,4 @@ func test_regex():
 	SME.regex = "[a-y]"
 	assert_is_ok("t", true)
 	assert_is_ok("z", false)
+	assert_is_ok("tt", false)

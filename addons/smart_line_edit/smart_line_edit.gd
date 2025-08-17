@@ -55,7 +55,8 @@ static var file_dialog: FileDialog:
 		_adapt_to_type()
 
 @export_group("Modifiers")
-## String compiled into a Regex. If Regex don't match anything, string will be wrong.
+## String compiled into a Regex. If the regex does not match the whole string,
+## then the input will be wrong.
 ## This check is performed after [member checks] and before built-in checks.
 @export_multiline var regex: String = "":
 	set(new):
@@ -198,8 +199,11 @@ func is_ok(text: String):
 				wrong = false
 	
 	# Built-in checks
-	if _regex and _regex.search(text) == null:
-		wrong = true
+	if _regex:
+		var regex_match := _regex.search(text)
+		if regex_match == null or regex_match.get_string() != text:
+			# We must match the whole input
+			wrong = true
 	
 	match type:
 		InputType.DIRECTORY:
