@@ -12,8 +12,9 @@ config_version=5
 
 config/name="SmartLineEdit"
 config/tags=PackedStringArray("addon")
+run/main_scene="res://example/example.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
-config/icon="res://addons/smart_line_edit/SmartLineEdit.svg"
+config/icon="res://addons/smart_line_edit/smart_line_edit_icon.svg"
 
 [editor_plugins]
 

@@ -10,7 +10,7 @@ func before_each():
 #
 #
 #	func before_all():
-#		SME.type = SmartLineEdit.Types.INT
+#		SME.type = SmartLineEdit.InputType.INT
 
 func assert_is_ok(text: String, expected):
 	var result = SME.is_ok(text)
@@ -38,7 +38,7 @@ func assert_is_ok(text: String, expected):
 		pass_test("Good answer")
 
 func test_int():
-	SME.type = SmartLineEdit.Types.INT
+	SME.type = SmartLineEdit.InputType.INT
 	assert_is_ok("1", true)
 	assert_is_ok("1 + 1", "2")
 	assert_is_ok("10 / 2", "5")
@@ -68,7 +68,7 @@ func test_int():
 
 
 func test_float():
-	SME.type = SmartLineEdit.Types.FLOAT
+	SME.type = SmartLineEdit.InputType.FLOAT
 	
 	assert_is_ok("1 + 1", "2")
 	assert_is_ok("10 / 2", "5")
@@ -101,7 +101,7 @@ func test_float():
 	assert_is_ok("1.3", "1.4")
 	
 func test_file():
-	SME.type = SmartLineEdit.Types.FILE
+	SME.type = SmartLineEdit.InputType.FILE
 	assert_is_ok("res://test/unit/test_is_ok.gd", true)
 	assert_is_ok("res://i_totally_dont_exist.gd", false)
 	assert_is_ok("res://test/../test/unit/test_is_ok.gd", "res://test/unit/test_is_ok.gd")
@@ -137,7 +137,7 @@ func test_file():
 	assert_is_ok("res://READM.md", false)
 
 func test_directory():
-	SME.type = SmartLineEdit.Types.DIRECTORY
+	SME.type = SmartLineEdit.InputType.DIRECTORY
 	assert_is_ok("res://test/unit", true)
 	assert_is_ok("res://test/unit/", "res://test/unit")
 	assert_is_ok("res://i_totally_dont_exist/nor_me", false)
@@ -153,7 +153,7 @@ func test_directory():
 	
 	
 func test_regex():
-	SME.type = SmartLineEdit.Types.CUSTOM
+	SME.type = SmartLineEdit.InputType.CUSTOM
 	SME.regex = "[a-y]"
 	assert_is_ok("t", true)
 	assert_is_ok("z", false)

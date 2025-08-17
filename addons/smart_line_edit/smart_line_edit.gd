@@ -1,16 +1,18 @@
 @tool
-@icon("SmartLineEdit.svg")
+@icon("smart_line_edit_icon.svg")
 @static_unload
 extends HBoxContainer
 class_name SmartLineEdit
-## A LineEdit wich can perform string validation
+
+## A LineEdit wich can perform input validation
 
 signal valid_text_changed(new_text: String, old_text: String)
 signal value_changed(new_value, old_value)
 signal status_changed(new_status: Status, old_status: Status)
 signal submited(value)
 
-enum Types {
+
+enum InputType {
 	DIRECTORY, ## Must be a path to a directory. It will be made canonical on submit.
 	FILE, ## Must be a path to a file. It will be made canonical on submit.
 	INT, ## Must be an integer (ex: 2, -65, 999...)
@@ -18,7 +20,15 @@ enum Types {
 	CUSTOM, ## Use only [member checks]
 }
 
-const default_valid_texts = [
+
+enum Status {
+	OK, ## The text input is valid
+	CORRECTED, ## The text input was modified to be valid
+	WRONG, ## The text input is wrong
+}
+
+
+const _DEFAULT_VALID_TEXTS_BY_TYPE: Array[String] = [
 	"res://",
 	"res://example_file.txt", ## still invalid if requires must be valid
 	"1",
@@ -26,11 +36,6 @@ const default_valid_texts = [
 	"please enter a starting valid text",
 ]
 
-enum Status {
-	OK, ## The text input is valid
-	CORRECTED, ## The text input was modified to be valid
-	WRONG, ## The text input is wrong
-}
 
 ## The file dialog used by all SmartLineEdit by default.
 ## Use [member own_file_dialog] to change the file dialog of one instance.
@@ -44,14 +49,14 @@ static var file_dialog: FileDialog:
 		return file_dialog
 
 ## The type the value will be restricted to
-@export var type: Types = Types.INT:
+@export var type: InputType = InputType.INT:
 	set(new):
 		type = new
 		_adapt_to_type()
 
 @export_group("Modifiers")
 ## String compiled into a Regex. If Regex don't match anything, string will be wrong.
-## This check is performed after [member checks] and befor built-in checks.
+## This check is performed after [member checks] and before built-in checks.
 @export_multiline var regex: String = "":
 	set(new):
 		if regex:
@@ -61,9 +66,9 @@ static var file_dialog: FileDialog:
 		regex = new
 @export_subgroup("Int and Float")
 ## Only applies if [member type] is set to a number type (int, float...)
-@export var minimum: float = -1.79769e308
+@export var minimum: float = -INF
 ## Only applies if [member type] is set to a number type (int, float...)
-@export var maximum: float = 1.79769e308
+@export var maximum: float = INF
 ## Only applies if [member type] is set to a number type (int, float...)
 @export var step: float = 0.0
 ## See [method Expression.parse] parameter called [code]input_names[/code]
@@ -112,7 +117,7 @@ var expression_base_instance: Object
 @export_group("")
 
 ## The last valid text inputed. Please enter a valid text in the editor so it has one on start.
-@export var last_valid_text: String = default_valid_texts[type]
+@export var last_valid_text: String = _DEFAULT_VALID_TEXTS_BY_TYPE[type]
 
 ## Allow the addition of more checking functions to decide if it's a correct string.
 ## They are run [b]before[/b] [member regex] and built-in checks.
@@ -197,7 +202,7 @@ func is_ok(text: String):
 		wrong = true
 	
 	match type:
-		Types.DIRECTORY:
+		InputType.DIRECTORY:
 			var new_text: String = text.simplify_path()
 			if not must_exist or DirAccess.dir_exists_absolute(text):
 				if new_text != text:
@@ -205,7 +210,7 @@ func is_ok(text: String):
 					was_modified = true
 			else:
 				wrong = true
-		Types.FILE:
+		InputType.FILE:
 			var new_text: String = text.simplify_path()
 			
 			if not wrong and _file_regexes:
@@ -221,7 +226,7 @@ func is_ok(text: String):
 					was_modified = true
 			else:
 				wrong = true
-		Types.INT:
+		InputType.INT:
 			var number: float = 0.0
 			var parsed: bool = false
 			
@@ -246,7 +251,7 @@ func is_ok(text: String):
 			else:
 				wrong = true
 			
-		Types.FLOAT:
+		InputType.FLOAT:
 			var number: float = 0.0
 			var parsed: bool = false
 			
@@ -282,9 +287,9 @@ func is_ok(text: String):
 ## [br]Any other type will result in an unchanged string.
 func eval(string: String):
 	match type:
-		Types.INT:
+		InputType.INT:
 			return string.to_int()
-		Types.FLOAT:
+		InputType.FLOAT:
 			return string.to_float()
 		
 	## String as default
@@ -401,13 +406,13 @@ func open_file_dialog() -> void:
 	current_file_dialog.filters = file_patterns
 	current_file_dialog.current_path = last_valid_text
 	match type:
-		Types.FILE:
+		InputType.FILE:
 			if must_exist:
 				current_file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 			else:
 				current_file_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 			current_file_dialog.file_selected.connect(set_line_edit_text, CONNECT_ONE_SHOT)
-		Types.DIRECTORY:
+		InputType.DIRECTORY:
 			current_file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_DIR
 			current_file_dialog.dir_selected.connect(set_line_edit_text, CONNECT_ONE_SHOT)
 	
@@ -465,18 +470,18 @@ func _build_file_regexes() -> void:
 func _adapt_to_type() -> void:
 	# Show or not the file dialog button
 	if open_file_dialog_button:
-		open_file_dialog_button.visible = type == Types.DIRECTORY or type == Types.FILE
+		open_file_dialog_button.visible = type == InputType.DIRECTORY or type == InputType.FILE
 		shrink()
 	
 	# Update last_valid_text if it was left to default
-	if last_valid_text in default_valid_texts:
-		last_valid_text = default_valid_texts[type]
+	if last_valid_text in _DEFAULT_VALID_TEXTS_BY_TYPE:
+		last_valid_text = _DEFAULT_VALID_TEXTS_BY_TYPE[type]
 	
 	_setup_expression()
 
 
 func _setup_expression() -> void:
-	if type == Types.INT or type == Types.FLOAT:
+	if type == InputType.INT or type == InputType.FLOAT:
 		_expression = Expression.new()
 	else:
 		_expression = null

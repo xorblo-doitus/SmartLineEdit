@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://ssbququub4wc"]
+
+[ext_resource type="PackedScene" uid="uid://s6mk8i1l4u0t" path="res://addons/smart_line_edit/smart_line_edit.tscn" id="1_t3yyu"]
+
+[node name="Example" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Float" parent="VBoxContainer" instance=ExtResource("1_t3yyu")]
+layout_mode = 2
+size_flags_horizontal = 0
+type = 3
+last_valid_text = "42"
+
+[node name="Directory" parent="VBoxContainer" instance=ExtResource("1_t3yyu")]
+layout_mode = 2
+size_flags_horizontal = 0
+type = 0
+last_valid_text = "res://"
+
+[node name="Custom (letters, max five)" parent="VBoxContainer" instance=ExtResource("1_t3yyu")]
+layout_mode = 2
+size_flags_horizontal = 0
+type = 4
+regex = "[a-z]{0,5}"
+last_valid_text = "abc"
